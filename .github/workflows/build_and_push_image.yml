@@ -39,11 +39,20 @@ jobs:
           sed -i -e "s@node:16-buster@ghcr.io/longkey1/raspios-node:16-lite-arm64@" Dockerfile || true
           sed -i -e "s@^EXPOSE 8888$@i RUN apt-get install -y ffmpeg@" Dockerfile || true
 
+      - name: Set current date as env variable
+        env:
+          TZ: 'Asia/Tokyo'
+        run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: Show current datetime
+        run: echo ${{ env.CURRENT_DATETIME }}
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:arm64
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:arm64-latest
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:arm64-${{ env.CURRENT_DATE }}
           platforms: linux/arm64
