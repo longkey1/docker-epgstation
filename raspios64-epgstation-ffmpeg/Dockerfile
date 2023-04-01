@@ -9,5 +9,5 @@ RUN apt-get -y update
 # Install ffmpeg
 RUN apt-get -y install ffmpeg
 
-# Confirm ffmpeg version
-RUN ffmpeg -version
+# Confirm ffmpeg version and codecs
+RUN ffmpeg -codecs

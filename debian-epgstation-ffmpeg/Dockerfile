@@ -1,4 +1,4 @@
-FROM ghcr.io/longkey1/epgstationr:debian-epgstation
+FROM ghcr.io/longkey1/epgstation:debian-epgstation
 
 # Fix frontend not set error
 ARG DEBIAN_FRONTEND=noninteractive
@@ -9,5 +9,5 @@ RUN apt-get -y update
 # Install ffmpeg
 RUN apt-get -y install ffmpeg
 
-# Confirm ffmpeg version
-RUN ffmpeg -version
+# Confirm ffmpeg version and codecs
+RUN ffmpeg -codecs
