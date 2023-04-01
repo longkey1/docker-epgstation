@@ -1,4 +1,4 @@
-name: Publish Raspios64 EPGStaion Image
+name: Publish Debian EPGStaion Image
 
 on: workflow_dispatch
 
@@ -47,9 +47,8 @@ jobs:
 
       - name: Fix Dockerfile
         run: |
-          sed -i -e "s@FROM --platform=\$BUILDPLATFORM@FROM@" Dockerfile
-          sed -i -e "s@node:16-buster-slim@ghcr.io/longkey1/epgstation:raspios64-base@" Dockerfile
-          sed -i -e "s@node:16-buster@ghcr.io/longkey1/epgstation:raspios64-base@" Dockerfile
+          sed -i -e "s@node:16-buster-slim@ghcr.io/longkey1/epgstation:debian-base@" Dockerfile
+          sed -i -e "s@node:16-buster@ghcr.io/longkey1/epgstation:debian-base@" Dockerfile
 
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -57,6 +56,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation
-            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-${{ needs.setup.outputs.timestamp }}
-          platforms: linux/arm64
+            ghcr.io/${{ github.repository_owner }}/epgstation:debian-epgstation
+            ghcr.io/${{ github.repository_owner }}/epgstation:debian-epgstation-${{ needs.setup.outputs.timestamp }}

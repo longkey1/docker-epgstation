@@ -1,4 +1,4 @@
-FROM ghcr.io/longkey1/raspios:arm64-lite
+FROM ghcr.io/longkey1/epgstationr:raspios64-epgstation
 
 # Fix frontend not set error
 ARG DEBIAN_FRONTEND=noninteractive
@@ -9,5 +9,5 @@ RUN apt-get -y update
 # Install ffmpeg
 RUN apt-get -y install ffmpeg
 
-# Confirm node version
+# Confirm ffmpeg version
 RUN ffmpeg -version

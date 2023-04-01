@@ -13,7 +13,7 @@ jobs:
         id: settimestamp
         env:
           TZ: 'Asia/Tokyo'
-        run: echo "timestamp=$(date +'%Y%m%d')" >> $GITHUB_ENV
+        run: echo "timestamp=$(date +'%Y%m%d')" >> ${GITHUB_OUTPUT}
 
   publish_epgstation_ffmpeg:
     name: Publish Epgstation Ffmpeg Image
@@ -37,7 +37,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: ./epgstation-ffmpeg
+          context: .//raspios64-epgstation-ffmpeg
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-ffmpeg

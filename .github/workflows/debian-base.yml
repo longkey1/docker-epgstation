@@ -1,4 +1,4 @@
-name: Publish Raspios64 EPGStaion Image
+name: Publish Debian Base Image
 
 on: workflow_dispatch
 
@@ -15,8 +15,8 @@ jobs:
           TZ: 'Asia/Tokyo'
         run: echo "timestamp=$(date +'%Y%m%d')" >> ${GITHUB_OUTPUT}
 
-  publish_epgstation:
-    name: Publish EPGStation Image
+  publish_base:
+    name: Publish Base Image
     needs:
       - setup
     runs-on: ubuntu-latest
@@ -37,26 +37,11 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: 'l3tnun/EPGStation'
-
-      - name: Copy Dockerfile
-        run: cp Dockerfile.debian Dockerfile
-
-      - name: Fix Dockerfile
-        run: |
-          sed -i -e "s@FROM --platform=\$BUILDPLATFORM@FROM@" Dockerfile
-          sed -i -e "s@node:16-buster-slim@ghcr.io/longkey1/epgstation:raspios64-base@" Dockerfile
-          sed -i -e "s@node:16-buster@ghcr.io/longkey1/epgstation:raspios64-base@" Dockerfile
-
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./debian-base
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation
-            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-${{ needs.setup.outputs.timestamp }}
-          platforms: linux/arm64
+            ghcr.io/${{ github.repository_owner }}/epgstation:debian-base
+            ghcr.io/${{ github.repository_owner }}/epgstation:debian-base-${{ needs.setup.outputs.timestamp }}
