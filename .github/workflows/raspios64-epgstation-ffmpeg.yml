@@ -37,7 +37,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: ./Dockerfile.ffmpeg
+          context: ./epgstation-ffmpeg
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-ffmpeg
