@@ -1,10 +1,10 @@
-name: Publish EPGStaion on Raspios
+name: Publish Raspios64 EPGStaion ffmpeg Image
 
 on: workflow_dispatch
 
 jobs:
   setup:
-    name: Setup outputs
+    name: Setup Outputs
     runs-on: ubuntu-latest
     outputs:
       timestamp: ${{ steps.settimestamp.outputs.timestamp }}
@@ -15,11 +15,10 @@ jobs:
           TZ: 'Asia/Tokyo'
         run: echo "timestamp=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-  publish_epgstation:
-    name: Publish epgstation image
+  publish_epgstation_ffmpeg:
+    name: Publish Epgstation Ffmpeg Image
     needs:
       - setup
-      - base
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -35,26 +34,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: 'l3tnun/EPGStation'
-
-      - name: Copy Dockerfile
-        run: cp Dockerfile.debian Dockerfile
-
-      - name: Fix Dockerfile
-        run: |
-          sed -i -e "s@FROM --platform=\$BUILDPLATFORM@FROM@" Dockerfile
-          sed -i -e "s@node:16-buster-slim@ghcr.io/longkey1/raspios-node:16-lite-arm64@" Dockerfile
-          sed -i -e "s@node:16-buster@ghcr.io/longkey1/raspios-node:16-lite-arm64@" Dockerfile
-
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./Dockerfile.ffmpeg
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation
-            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-${{ needs.setup.outputs.timestamp }}
+            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-ffmpeg
+            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-ffmpeg-${{ needs.setup.outputs.timestamp }}
           platforms: linux/arm64

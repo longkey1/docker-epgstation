@@ -1,10 +1,10 @@
-name: Publish Raspios Base Image
+name: Publish Raspios64 Base Image
 
 on: workflow_dispatch
 
 jobs:
   setup:
-    name: Setup outputs
+    name: Setup Outputs
     runs-on: ubuntu-latest
     outputs:
       timestamp: ${{ steps.settimestamp.outputs.timestamp }}
@@ -16,7 +16,7 @@ jobs:
         run: echo "timestamp=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
   publish_base:
-    name: Publish base image
+    name: Publish Base Image
     needs:
       - setup
     runs-on: ubuntu-latest
@@ -24,6 +24,9 @@ jobs:
       packages: write
       contents: read
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
