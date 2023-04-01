@@ -1,4 +1,4 @@
-FROM ghcr.io/longkey1/epgstationr:raspios64-epgstation
+FROM ghcr.io/longkey1/epgstation:raspios64-epgstation
 
 # Fix frontend not set error
 ARG DEBIAN_FRONTEND=noninteractive
