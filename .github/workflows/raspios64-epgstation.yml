@@ -1,0 +1,46 @@
+name: Publish EPGStaion on Raspios with ffmpeg
+
+on: workflow_dispatch
+
+jobs:
+  setup:
+    name: Setup outputs
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.settimestamp.outputs.timestamp }}
+    steps:
+      - name: Set timestamp output
+        id: settimestamp
+        env:
+          TZ: 'Asia/Tokyo'
+        run: echo "timestamp=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+  publish_epgstation_ffmpeg:
+    name: Publish epgstation-ffmpeg image
+    needs:
+      - setup
+      - publish_epgstation
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./Dockerfile.ffmpeg
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-ffmpeg
+            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-ffmpeg-${{ needs.setup.outputs.timestamp }}
+          platforms: linux/arm64

@@ -1,18 +1,29 @@
-name: build_and_publish_image
+name: Publish EPGStaion on Raspios
 
-on:
-  push:
-    branches:
-      - master
+on: workflow_dispatch
 
 jobs:
-  build_and_publish_image:
+  setup:
+    name: Setup outputs
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.settimestamp.outputs.timestamp }}
+    steps:
+      - name: Set timestamp output
+        id: settimestamp
+        env:
+          TZ: 'Asia/Tokyo'
+        run: echo "timestamp=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+  publish_epgstation:
+    name: Publish epgstation image
+    needs:
+      - setup
+      - base
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
-    env:
-      IMAGE_NAME: raspios-epgstation
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -37,15 +48,6 @@ jobs:
           sed -i -e "s@FROM --platform=\$BUILDPLATFORM@FROM@" Dockerfile
           sed -i -e "s@node:16-buster-slim@ghcr.io/longkey1/raspios-node:16-lite-arm64@" Dockerfile
           sed -i -e "s@node:16-buster@ghcr.io/longkey1/raspios-node:16-lite-arm64@" Dockerfile
-          sed -i -e "/^EXPOSE 8888$/i RUN apt-get install -y ffmpeg" Dockerfile
-
-      - name: Set current date as env variable
-        env:
-          TZ: 'Asia/Tokyo'
-        run: echo "CURRENT_DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-
-      - name: Show current datetime
-        run: echo ${{ env.CURRENT_DATETIME }}
 
       - name: Build and push
         uses: docker/build-push-action@v4
@@ -53,6 +55,6 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:arm64-latest
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:arm64-${{ env.CURRENT_DATE }}
+            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation
+            ghcr.io/${{ github.repository_owner }}/epgstation:raspios64-epgstation-${{ needs.setup.outputs.timestamp }}
           platforms: linux/arm64
